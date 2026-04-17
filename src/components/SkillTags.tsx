@@ -10,24 +10,25 @@ export const SkillTags = ({ tags, variant = "neutral" }: Props) => {
   if (!tags?.length) return <p className="text-sm text-muted-foreground">None detected</p>;
 
   const styles = {
-    missing: "border-destructive/30 bg-destructive/10 text-destructive",
-    matching: "border-primary/30 bg-primary/10 text-primary",
-    neutral: "border-border bg-muted/40 text-foreground",
+    missing: "border-warning/25 bg-warning/[0.06] text-warning hover:bg-warning/10",
+    matching: "border-primary/25 bg-primary/[0.06] text-primary hover:bg-primary/10",
+    neutral: "border-border bg-muted/30 text-foreground hover:bg-muted/50",
   } as const;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {tags.map((t, i) => (
         <motion.span
           key={t + i}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.04, duration: 0.3 }}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.03, duration: 0.25 }}
           className={cn(
-            "rounded-full border px-3 py-1 text-xs font-medium transition-transform hover:-translate-y-0.5",
+            "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-all",
             styles[variant]
           )}
         >
+          <span className="h-1 w-1 rounded-full bg-current opacity-60" />
           {t}
         </motion.span>
       ))}
