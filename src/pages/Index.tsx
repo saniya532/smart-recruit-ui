@@ -1,16 +1,103 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Navbar } from "@/components/Navbar";
+import { ResumeUpload } from "@/components/ResumeUpload";
+import { RolePrediction } from "@/components/RolePrediction";
+import { JdMatch } from "@/components/JdMatch";
+import { AtsChecker } from "@/components/AtsChecker";
+import { WhatsAppPanel } from "@/components/WhatsAppPanel";
+import { SkillsRadar } from "@/components/SkillsRadar";
+import { uploadResume } from "@/lib/api";
+import { toast } from "sonner";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+interface RoleData {
+  predicted_role: string;
+  match_percentage: number;
+  top_roles: { role: string; score: number }[];
+  missing_skills: string[];
+  skills_radar?: { skill: string; value: number }[];
+}
+
+const DEMO: RoleData = {
+  predicted_role: "Senior Frontend Engineer",
+  match_percentage: 87,
+  top_roles: [
+    { role: "Senior Frontend Engineer", score: 87 },
+    { role: "Full-Stack Developer", score: 74 },
+    { role: "UI Engineer", score: 68 },
+  ],
+  missing_skills: ["GraphQL", "Kubernetes", "Rust", "WebAssembly", "Terraform"],
+  skills_radar: [
+    { skill: "Frontend", value: 92 },
+    { skill: "Backend", value: 68 },
+    { skill: "DevOps", value: 54 },
+    { skill: "Design", value: 78 },
+    { skill: "Testing", value: 71 },
+    { skill: "Leadership", value: 60 },
+  ],
+};
+
+const Index = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<RoleData | null>(null);
+
+  const handleAnalyze = async () => {
+    if (!file) return toast.error("Please upload a resume first");
+    setLoading(true);
+    try {
+      const data = await uploadResume(file);
+      setRole({ ...DEMO, ...data });
+      toast.success("Analysis complete ✨");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Analysis failed";
+      setRole(DEMO);
+      toast.error(`Backend offline — showing demo. ${msg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="relative min-h-screen">
+      {/* Decorative grid */}
+      <div className="pointer-events-none fixed inset-0 grid-bg opacity-[0.04]" aria-hidden />
+
+      <Navbar />
+
+      <main className="pb-24">
+        <ResumeUpload file={file} onFileChange={setFile} onAnalyze={handleAnalyze} loading={loading} />
+
+        {role && (
+          <>
+            <RolePrediction data={role} />
+
+            {role.skills_radar && role.skills_radar.length > 0 && (
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="container py-6"
+              >
+                <SkillsRadar data={role.skills_radar} />
+              </motion.section>
+            )}
+          </>
+        )}
+
+        <JdMatch file={file} />
+        <AtsChecker file={file} />
+        <WhatsAppPanel payload={role ? { role } : null} />
+
+        <footer className="container mt-16 border-t border-border/50 pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+            <span className="font-mono">© 2026 SMART RECRUIT AI · v3.2</span>
+            <span>Built for recruiters who move fast.</span>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
