@@ -48,7 +48,7 @@ const Index = () => {
     try {
       const data = await uploadResume(file);
       setRole({ ...DEMO, ...data });
-      toast.success("Analysis complete ✨");
+      toast.success("Analysis complete");
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Analysis failed";
       setRole(DEMO);
@@ -60,12 +60,9 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Decorative grid */}
-      <div className="pointer-events-none fixed inset-0 grid-bg opacity-[0.04]" aria-hidden />
-
       <Navbar />
 
-      <main className="pb-24">
+      <main>
         <ResumeUpload file={file} onFileChange={setFile} onAnalyze={handleAnalyze} loading={loading} />
 
         {role && (
@@ -74,10 +71,10 @@ const Index = () => {
 
             {role.skills_radar && role.skills_radar.length > 0 && (
               <motion.section
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="container py-6"
+                className="container pb-4"
               >
                 <SkillsRadar data={role.skills_radar} />
               </motion.section>
@@ -89,10 +86,13 @@ const Index = () => {
         <AtsChecker file={file} />
         <WhatsAppPanel payload={role ? { role } : null} />
 
-        <footer className="container mt-16 border-t border-border/50 pt-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-            <span className="font-mono">© 2026 SMART RECRUIT AI · v3.2</span>
-            <span>Built for recruiters who move fast.</span>
+        <footer className="border-t border-border/60 bg-background/40">
+          <div className="container flex flex-wrap items-center justify-between gap-3 py-6">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              <span className="font-mono">© 2026 SMART RECRUIT AI · v3.2</span>
+            </div>
+            <span className="text-xs text-muted-foreground">Built for recruiters who move fast.</span>
           </div>
         </footer>
       </main>
